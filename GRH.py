@@ -1,17 +1,20 @@
-from mitmproxy import http
+import requests
+import mitmproxy.http
 import json
-import os
 
-def load_json(filename):
-    path = os.path.join(os.path.dirname(__file__), filename)
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+def load_json_from_github(url):
+    response = requests.get(url)
+    return response.json()
 
-inventory_json = load_json("inventory.json")
-catalog_json = load_json("catalog.json")
-buy_json = load_json("buy.json")
+inventory_url = "https://raw.githubusercontent.com/igamegod/GRH-iOS/main/inventory.json"
+catalog_url = "https://raw.githubusercontent.com/igamegod/GRH-iOS/main/catalog.json"
+buy_url = "https://raw.githubusercontent.com/igamegod/GRH-iOS/main/buy.json"
 
-def response(flow: http.HTTPFlow) -> None:
+inventory_json = load_json_from_github(inventory_url)
+catalog_json = load_json_from_github(catalog_url)
+buy_json = load_json_from_github(buy_url)
+
+def response(flow: mitmproxy.http.HTTPFlow) -> None:
     url = flow.request.pretty_url
 
     if url == "https://go.gunraidersapi.com/api/v32/inventory/all/0":
